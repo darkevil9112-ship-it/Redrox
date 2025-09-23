@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>All-in-One Premium Demo Platform</title>
+<meta name="description" content="Full-featured demo: dashboard, wallet, profile, jobs, messages, admin, referral, premium & more. Frontend-only demo.">
+
+<!-- ===================== Inline CSS (premium theme) ===================== -->
+<style>
+  :root{
+    --bg:#0f1724; --card:#0b1220; --muted:#9aa8b2; --accent1:#6a7cff; --accent2:#00d4ff;
+    --glass: rgba(255,255,255,0.03); --radius:14px; --glass-2: rgba(255,255,255,0.04);
+    --success:#22c55e; --danger:#ff6b6b;
+  }
+  /* Light mode tokens (body.light) */
+  body.light{ --bg:#f5f7fb; --card:#fff; --muted:#4b5563; --accent1:#4a6cf7; --accent2:#0bc5ea; --glass: rgba(2,6,23,0.03); --glass-2: rgba(2,6,23,0.02); color:#042028; }
+  *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#04101a);color:#e6f0f6}
+  a{color:var(--accent1);text-decoration:none}
+  /* header */
+  header.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(90deg,var(--accent1),var(--accent2));box-shadow:0 8px 30px rgba(2,6,23,0.45);position:sticky;top:0;z-index:50}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{width:44px;height:44px;border-radius:10px;background:#fff;padding:6px}
+  .brand h1{font-size:18px;margin:0}
+  .top-actions{display:flex;gap:10px;align-items:center}
+  .pill{background:rgba(255,255,255,0.08);padding:8px 12px;border-radius:999px;color:#fff;font-weight:700}
+
+  /* layout */
+  .app{display:flex;min-height:calc(100vh - 68px)}
+  .sidebar{width:260px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));border-right:1px solid rgba(255,255,255,0.02);position:sticky;top:68px;height:calc(100vh - 68px);overflow:auto}
+  .sidebar .user{display:flex;gap:12px;align-items:center;padding:10px;border-radius:12px;background:var(--glass-2);margin-bottom:12px}
+  .avatar{width:56px;height:56px;border-radius:12px;background:#fff}
+  .menu{margin-top:10px}
+  .menu a{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;color:inherit;margin-bottom:6px}
+  .menu a:hover{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#021; font-weight:700}
+  .menu a.active{background:linear-gradient(90deg,var(--accent2),var(--accent1));color:#021;font-weight:800}
+
+  .main{flex:1;padding:20px;overflow:auto}
+  .hero{display:flex;gap:18px;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .hero .left h2{margin:0;font-size:20px}
+  .hero .muted{color:var(--muted);font-size:13px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px}
+  .card{background:var(--card);padding:14px;border-radius:var(--radius);box-shadow:0 8px 20px rgba(2,6,23,0.5);border:1px solid rgba(255,255,255,0.03)}
+  .card h3{margin:0 0 6px 0;color:var(--accent1)}
+  .big{font-size:20px;font-weight:800}
+
+  /* layout blocks */
+  .two-col{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+  .panel{padding:12px;border-radius:12px;background:var(--card);box-shadow:0 8px 30px rgba(2,6,23,0.45)}
+
+  /* lists */
+  .list{list-style:none;padding:0;margin:0}
+  .list li{padding:10px;border-radius:8px;margin-bottom:8px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent)}
+  .muted{color:var(--muted);font-size:13px}
+
+  /* forms */
+  input,textarea,select{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;margin:8px 0}
+  button.btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));border:0;padding:10px 12px;border-radius:10px;color:#021;cursor:pointer;font-weight:700}
+  button.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+  small.note{font-size:12px;color:var(--muted)}
+
+  /* overlay modal */
+  .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:120}
+  .overlay.active{display:flex}
+  .modal{width:96%;max-width:760px;background:var(--card);padding:18px;border-radius:12px;box-shadow:0 12px 40px rgba(2,6,23,0.6)}
+  .modal .row{display:flex;gap:12px}
+  .close-x{float:right;background:transparent;border:0;color:var(--muted);font-size:18px;cursor:pointer}
+
+  /* responsive */
+  @media(max-width:1000px){
+    .sidebar{display:none}
+    .app{flex-direction:column}
+    .two-col{grid-template-columns:1fr}
+  }
+
+  /* small helpers */
+  .center{display:flex;align-items:center;justify-content:center}
+  .badge{background:var(--accent2);color:#021;padding:6px 10px;border-radius:999px;font-weight:800}
+  .chip{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:999px;font-weight:700}
+  .success{color:var(--success);font-weight:700}
+  .danger{color:var(--danger);font-weight:700}
+  footer{margin-top:18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='14' width='64' height='64' fill='%23ffffff'/></svg>" alt="logo">
+      <div>
+        <h1>CompanyX</h1>
+        <div class="muted">Premium All-in-One Demo</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div class="pill js-username">Guest</div>
+      <div class="pill" id="notifBell">🔔 <span id="notifCount" class="badge" style="display:none">0</span></div>
+      <div class="pill" id="themeToggle" title="Toggle theme">🌓</div>
+    </div>
+  </header>
+
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="user">
+        <div class="avatar"></div>
+        <div>
+          <div id="sName" style="font-weight:800">Guest</div>
+          <div class="muted" id="sRole">Not logged</div>
+        </div>
+      </div>
+
+      <nav class="menu" id="menu">
+        <a href="#" data-page="dashboard" class="active">🏠 Dashboard</a>
+        <a href="#" data-page="wallet">💳 Wallet</a>
+        <a href="#" data-page="jobs">💼 Jobs</a>
+        <a href="#" data-page="messages">✉️ Messages</a>
+        <a href="#" data-page="tasks">✅ Tasks</a>
+        <a href="#" data-page="referral">🔗 Referral</a>
+        <a href="#" data-page="premium">⭐ Premium</a>
+        <a href="#" data-page="transactions">📜 Transactions</a>
+        <a href="#" data-page="support">🆘 Support</a>
+        <a href="#" data-page="profile">👤 Profile</a>
+        <a href="#" data-page="admin" class="js-admin" style="display:none">🛠 Admin Panel</a>
+        <a href="#" data-page="settings">⚙ Settings</a>
+        <a href="#" id="logoutBtn">🚪 Logout</a>
+      </nav>
+
+      <div style="margin-top:14px">
+        <div class="muted small">Quick actions</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn" onclick="openOverlay('deposit')">Add Fund</button>
+          <button class="btn ghost" onclick="openOverlay('withdraw')">Withdraw</button>
+        </div>
+      </div>
+
+      <hr style="margin:14px 0;border-color:rgba(255,255,255,0.03)">
+      <div class="muted small">CompanyX • Demo</div>
+      <div class="muted small">© 2025</div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main" id="main">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="left">
+          <h2>Welcome back, <span id="welcomeName">Guest</span></h2>
+          <div class="muted">All-in-one demo platform — frontend only</div>
+        </div>
+        <div class="right">
+          <div class="chip" id="statusChip">Status: <span class="success">Active</span></div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD PAGE -->
+      <section id="dashboard" class="page">
+        <div class="cards">
+          <div class="card">
+            <h3>Balance</h3>
+            <div class="big" id="balanceDisplay">৳ 0</div>
+            <small class="muted">Available funds in Job Wallet</small>
+          </div>
+          <div class="card">
+            <h3>Invite Wallet</h3>
+            <div class="big" id="inviteDisplay">৳ 0</div>
+            <small class="muted">Referral / Invite earnings</small>
+          </div>
+          <div class="card">
+            <h3>Daily Income</h3>
+            <div class="big" id="dailyDisplay">৳ 0</div>
+            <small class="muted">Expected daily earning</small>
+          </div>
+          <div class="card">
+            <h3>Tasks Completed</h3>
+            <div class="big" id="tasksDone">0</div>
+            <small class="muted">This month</small>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <div class="panel card">
+              <h3>Earnings Chart</h3>
+              <canvas id="earnChart" width="600" height="160" style="width:100%;max-width:100%"></canvas>
+              <small class="muted">Demo earnings (static)</small>
+            </div>
+
+            <div class="panel card" style="margin-top:12px">
+              <h3>Recent Activity</h3>
+              <ul class="list" id="activityList">
+                <li>No recent activity (demo)</li>
+              </ul>
+            </div>
+          </div>
+
+          <aside>
+            <div class="panel card">
+              <h3>Quick Summary</h3>
+              <div class="muted small">Active Plans</div>
+              <div style="margin-top:8px">
+                <div class="chip">General</div> <div class="chip">Prime</div>
+              </div>
+              <hr style="margin:12px 0;border-color:rgba(255,255,255,0.03)">
+              <div class="muted small">Notifications</div>
+              <ul class="list" id="miniNotif">
+                <li>No notifications</li>
+              </ul>
+            </div>
+
+            <div class="panel card" style="margin-top:12px">
+              <h3>Leaderboard</h3>
+              <ol class="muted small">
+                <li>Alice — ৳ 12,000</li>
+                <li>Rafi — ৳ 9,300</li>
+                <li>You — ৳ <span id="leadYou">0</span></li>
+              </ol>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- WALLET PAGE -->
+      <section id="wallet" class="page" style="display:none">
+        <div class="panel card">
+          <h3>Wallets</h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+            <div style="flex:1;min-width:160px" class="card">
+              <div class="muted small">Job Wallet</div>
+              <div class="big" id="wJob">৳ 0</div>
+            </div>
+            <div style="flex:1;min-width:160px" class="card">
+              <div class="muted small">Invite Wallet</div>
+              <div class="big" id="wInvite">৳ 0</div>
+            </div>
+            <div style="flex:1;min-width:160px" class="card">
+              <div class="muted small">Prime Wallet</div>
+              <div class="big" id="wPrime">৳ 0</div>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <h4>Transactions</h4>
+            <table class="table" id="txTable">
+              <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Note</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- JOBS PAGE -->
+      <section id="jobs" class="page" style="display:none">
+        <div class="panel card">
+          <h3>Available Jobs</h3>
+          <div style="margin-top:12px">
+            <input id="jobSearch" placeholder="Search jobs by keyword..." />
+          </div>
+          <div id="jobList" style="margin-top:12px">
+            <!-- jobs injected by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- MESSAGES PAGE -->
+      <section id="messages" class="page" style="display:none">
+        <div class="two-col" style="gap:10px">
+          <div>
+            <div class="panel card">
+              <h3>Inbox</h3>
+              <ul class="list" id="inboxList">
+                <!-- messages -->
+              </ul>
+            </div>
+          </div>
+          <aside>
+            <div class="panel card">
+              <h3>Chat</h3>
+              <div id="chatBox" style="height:220px;overflow:auto;background:rgba(255,255,255,0.02);padding:10px;border-radius:8px"></div>
+              <div style="margin-top:10px;display:flex;gap:8px">
+                <input id="chatInp" placeholder="Type message..." />
+                <button class="btn" onclick="sendChat()">Send</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- TASKS PAGE -->
+      <section id="tasks" class="page" style="display:none">
+        <div class="panel card">
+          <h3>Tasks / Micro Jobs</h3>
+          <div style="margin-top:8px">
+            <input id="taskInput" placeholder="Describe new task..." />
+            <button class="btn" onclick="addTask()">Add Task</button>
+          </div>
+          <ul class="list" id="taskList" style="margin-top:12px"></ul>
+        </div>
+      </section>
+
+      <!-- REFERRAL PAGE -->
+      <section id="referral" class="page" style="display:none">
+        <div class="panel card">
+          <h3>Referral Program</h3>
+          <p class="muted">Share your referral link & earn bonuses.</p>
+          <div style="display:flex;gap:8px">
+            <input id="referralLink" value="https://demo.companyx.com/?ref=DEMO123" />
+            <button class="btn" onclick="copyRef()">Copy</button>
+          </div>
+          <div style="margin-top:12px">
+            <h4>Your tree (demo)</h4>
+            <pre id="refTree" class="muted small">No referrals yet</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- PREMIUM PAGE -->
+      <section id="premium" class="page" style="display:none">
+        <div class="panel card">
+          <h3>Premium Plans</h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+            <div class="card" style="flex:1;min-width:180px">
+              <h4>General</h4><p class="muted">Free</p><p>Daily: ৳ 20 - 30</p><button class="btn ghost" onclick="alert('Already in General (demo)')">Current</button>
+            </div>
+            <div class="card" style="flex:1;min-width:180px">
+              <h4>Prime</h4><p class="muted">৳ 250</p><p>Daily: ৳ 150</p><button class="btn" onclick="purchase('Prime',250)">Purchase</button>
+            </div>
+            <div class="card" style="flex:1;min-width:180px">
+              <h4>Elite</h4><p class="muted">৳ 1200</p><p>Daily: ৳ 800</p><button class="btn" onclick="purchase('Elite',1200)">Purchase</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS PAGE -->
+      <section id="transactions" class="page" style="display:none">
+        <div class="panel card">
+          <h3>All Transactions</h3>
+          <table class="table" id="txAll">
+            <thead><tr><th>Date</th><th>User</th><th>Type</th><th>Amount</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SUPPORT PAGE -->
+      <section id="support" class="page" style="display:none">
+        <div class="panel card">
+          <h3>Support Ticket</h3>
+          <input id="supportTitle" placeholder="Issue title" />
+          <textarea id="supportBody" placeholder="Describe your issue"></textarea>
+          <button class="btn" onclick="submitTicket()">Submit Ticket</button>
+          <div style="margin-top:12px"><h4>Your tickets</h4><ul id="ticketList" class="list"></ul></div>
+        </div>
+      </section>
+
+      <!-- PROFILE PAGE -->
+      <section id="profile" class="page" style="display:none">
+        <div class="panel card">
+          <h3>Profile</h3>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="width:110px"><img id="pfAvatar" src="https://via.placeholder.com/110" style="width:110px;border-radius:12px"></div>
+            <div style="flex:1">
+              <input id="pfName" placeholder="Full name" />
+              <input id="pfEmail" placeholder="Email" />
+              <input id="pfPhone" placeholder="Phone" />
+              <div style="margin-top:8px"><button class="btn" onclick="saveProfile()">Save Profile</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADMIN PAGE -->
+      <section id="admin" class="page" style="display:none">
+        <div class="panel card">
+          <h3>Admin Panel (Demo)</h3>
+          <div style="margin-top:8px">
+            <h4>Users</h4>
+            <ul id="adminUsers" class="list"></ul>
+            <h4 style="margin-top:8px">Recent Transactions</h4>
+            <table class="table" id="adminTx"><thead><tr><th>Date</th><th>User</th><th>Type</th><th>Amount</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETTINGS PAGE -->
+      <section id="settings" class="page" style="display:none">
+        <div class="panel card">
+          <h3>Settings</h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div style="min-width:220px">
+              <label class="muted">Theme</label>
+              <select id="themeSel" onchange="applyTheme()"><option value="dark">Dark</option><option value="light">Light</option></select>
+            </div>
+            <div style="min-width:220px">
+              <label class="muted">Language</label>
+              <select id="langSel"><option value="en">English</option><option value="bn">Bangla</option></select>
+            </div>
+            <div style="min-width:220px">
+              <label class="muted">Notification</label>
+              <select id="notifSel"><option value="on">On</option><option value="off">Off</option></select>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <button class="btn ghost" onclick="resetDemo()">Reset demo data</button>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <small class="muted">Demo site • Frontend only • Not real payments</small>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Overlay / Modals -->
+  <div class="overlay" id="overlay">
+    <div class="modal" id="modalContent">
+      <button class="close-x" onclick="closeOverlay()">✕</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+<!-- ===================== Inline JS ===================== -->
+<script>
+/* ===== Demo data & utilities ===== */
+const DEMO_USERS = [{username:'user',pass:'1234',name:'Demo User',role:'user'},{username:'admin',pass:'1234',name:'Admin',role:'admin'}];
+const STORAGE_KEYS = {user:'demo_user',tx:'demo_tx',tasks:'demo_tasks',tickets:'demo_tickets',jobs:'demo_jobs',messages:'demo_msgs',notifs:'demo_notifs'};
+
+function now(){ return new Date().toLocaleString(); }
+function load(key, def){ return JSON.parse(localStorage.getItem(key) || JSON.stringify(def)); }
+function save(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+/* ===== Initialize demo DB if empty ===== */
+(function initDemo(){
+  if(!localStorage.getItem(STORAGE_KEYS.jobs)){
+    const jobs = [
+      {id:1,title:'Build Responsive Website',budget:500,days:10,desc:'Full site with admin panel'},
+      {id:2,title:'Logo & Brand Kit',budget:80,days:3,desc:'Vector logo + social kit'},
+      {id:3,title:'SEO Optimization',budget:150,days:7,desc:'On-page & off-page SEO'}
+    ];
+    save(STORAGE_KEYS.jobs,jobs);
+  }
+  if(!localStorage.getItem(STORAGE_KEYS.tx)) save(STORAGE_KEYS.tx,[]);
+  if(!localStorage.getItem(STORAGE_KEYS.tasks)) save(STORAGE_KEYS.tasks,[]);
+  if(!localStorage.getItem(STORAGE_KEYS.tickets)) save(STORAGE_KEYS.tickets,[]);
+  if(!localStorage.getItem(STORAGE_KEYS.messages)) save(STORAGE_KEYS.messages,[]);
+  if(!localStorage.getItem(STORAGE_KEYS.notifs)) save(STORAGE_KEYS.notifs,[]);
+})();
+
+/* ===== Auth & user helpers ===== */
+function authLogin(u,p){
+  const all = DEMO_USERS.concat(load('custom_users',[]));
+  const found = all.find(x=>x.username===u && x.pass===p);
+  if(found){ localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(found)); renderUI(); return found; }
+  return null;
+}
+function authLogout(){ localStorage.removeItem(STORAGE_KEYS.user); renderUI(); }
+function currentUser(){ return JSON.parse(localStorage.getItem(STORAGE_KEYS.user) || 'null'); }
+function requireLogin(redirectTo='loginPrompt'){ if(!currentUser()){ openOverlay('login'); return false; } return true; }
+
+/* ===== Render UI state ===== */
+function renderUI(){
+  const u = currentUser();
+  document.querySelectorAll('.js-username').forEach(el=> el.textContent = u ? u.name : 'Guest');
+  document.getElementById('sName').textContent = u ? u.name : 'Guest';
+  document.getElementById('sRole').textContent = u ? (u.role || 'user') : 'Not logged';
+  document.getElementById('welcomeName').textContent = u ? u.name : 'Guest';
+  // admin link
+  document.querySelectorAll('.js-admin').forEach(el=> el.style.display = (u && u.role==='admin') ? 'inline-block' : 'none');
+  // set profile
+  if(u){
+    document.getElementById('pfName').value = u.name || '';
+    document.getElementById('pfEmail').value = u.email || '';
+    document.getElementById('pfPhone').value = u.phone || '';
+  } else {
+    if(document.getElementById('pfName')) document.getElementById('pfName').value = '';
+  }
+  // balance display
+  const tx = load(STORAGE_KEYS.tx,[]);
+  let jobBal = tx.filter(t=> t.type==='add' || t.type==='income' ).reduce((s,t)=> s + Number(t.amount), 0) - tx.filter(t=> t.type==='withdraw' || t.type==='spend').reduce((s,t)=> s + Number(t.amount),0);
+  jobBal = Math.max(0, Math.round(jobBal));
+  document.getElementById('balanceDisplay').textContent = '৳ ' + jobBal;
+  document.getElementById('wJob').textContent = '৳ ' + jobBal;
+  document.getElementById('wInvite').textContent = '৳ ' + (load('invite_bal',0) || 0);
+  document.getElementById('wPrime').textContent = '৳ ' + (load('prime_bal',0)||0);
+  document.getElementById('inviteDisplay').textContent = '৳ ' + (load('invite_bal',0)||0);
+  document.getElementById('dailyDisplay').textContent = '৳ ' + (load('daily_income',20)||20);
+
+  // transactions table
+  const tbody = document.querySelector('#txTable tbody'); if(tbody){ tbody.innerHTML = ''; load(STORAGE_KEYS.tx,[]).slice().reverse().forEach(t=> {
+    const tr = document.createElement('tr'); tr.innerHTML = `<td>${t.date}</td><td>${t.type}</td><td>${t.amount}</td><td>${t.note||''}</td>`; tbody.appendChild(tr);
+  }); }
+  // all tx
+  const tbodyAll = document.querySelector('#txAll tbody'); if(tbodyAll){ tbodyAll.innerHTML=''; load(STORAGE_KEYS.tx,[]).slice().reverse().forEach(t=> {
+    const tr = document.createElement('tr'); tr.innerHTML = `<td>${t.date}</td><td>${t.user||'demo'}</td><td>${t.type}</td><td>৳ ${t.amount}</td>`; tbodyAll.appendChild(tr);
+  }); }
+
+  // activity list
+  const act = document.getElementById('activityList'); if(act){ const history = load('activity',[]); act.innerHTML = ''; if(history.length===0) act.innerHTML='<li>No recent activity (demo)</li>'; else history.slice().reverse().forEach(h=> { const li=document.createElement('li'); li.textContent = h; act.appendChild(li); }); }
+
+  // inbox / messages
+  const inbox = document.getElementById('inboxList');
+  const msgs = load(STORAGE_KEYS.messages,[]);
+  if(inbox){ inbox.innerHTML=''; if(msgs.length===0) inbox.innerHTML='<li>No messages</li>'; else msgs.forEach(m=> { const li=document.createElement('li'); li.innerHTML=`<b>${m.from}</b> — ${m.text}`; inbox.appendChild(li);});}
+  // chatbox
+  const chatBox = document.getElementById('chatBox'); if(chatBox){ chatBox.innerHTML=''; msgs.forEach(m=> { const d=document.createElement('div'); d.style.marginBottom='8px'; d.innerHTML = `<small class="muted">${m.time} — <b>${m.from}</b></small><div>${m.text}</div>`; chatBox.appendChild(d);}); }
+
+  // tasks
+  const tasks = load(STORAGE_KEYS.tasks,[]);
+  const tList = document.getElementById('taskList'); if(tList){ tList.innerHTML=''; if(tasks.length===0) tList.innerHTML='<li>No tasks yet</li>'; else tasks.forEach(t=> { const li=document.createElement('li'); li.innerHTML = `${t.text} <button style="float:right" onclick="completeTask(${t.id})">Done</button>`; tList.appendChild(li);}); document.getElementById('tasksDone').textContent = tasks.filter(x=>x.done).length; }
+
+  // tickets
+  const tickets = load(STORAGE_KEYS.tickets,[]);
+  const tBox = document.getElementById('ticketList'); if(tBox){ tBox.innerHTML=''; if(tickets.length===0) tBox.innerHTML='<li>No tickets</li>'; else tickets.forEach(t=> { const li=document.createElement('li'); li.innerHTML = `<b>${t.title}</b> — ${t.status}`; tBox.appendChild(li);}); }
+
+  // jobs list
+  renderJobs();
+
+  // admin lists
+  const adminUsers = document.getElementById('adminUsers'); if(adminUsers){ adminUsers.innerHTML=''; DEMO_USERS.concat(load('custom_users',[])).forEach(u=> { const li=document.createElement('li'); li.textContent = `${u.username} — ${u.name} — ${u.role||'user'}`; adminUsers.appendChild(li); }); }
+  const adminTx = document.querySelector('#adminTx tbody'); if(adminTx){ adminTx.innerHTML=''; load(STORAGE_KEYS.tx,[]).slice().reverse().forEach(t=> { const tr=document.createElement('tr'); tr.innerHTML = `<td>${t.date}</td><td>${t.user||'demo'}</td><td>${t.type}</td><td>৳ ${t.amount}</td>`; adminTx.appendChild(tr); }); }
+
+  // notifications
+  const nots = load(STORAGE_KEYS.notifs,[]);
+  document.getElementById('miniNotif').innerHTML = nots.length ? nots.map(n=>`<li>${n}</li>`).join('') : '<li>No notifications</li>';
+  const nc = document.getElementById('notifCount'); if(nc){ if(nots.length>0){ nc.style.display='inline-block'; nc.textContent = nots.length; } else nc.style.display='none'; }
+
+  // leaderboard user points
+  document.getElementById('leadYou').textContent = (load('user_points',0)||0);
+
+  // chart
+  drawChart();
+}
+
+/* ===== Chart (simple bar chart) ===== */
+function drawChart(){
+  const canvas = document.getElementById('earnChart'); if(!canvas) return;
+  const ctx = canvas.getContext('2d'); const w = canvas.width = canvas.offsetWidth; const h = canvas.height = 160;
+  ctx.clearRect(0,0,w,h);
+  const data = [200,300,150,400,500];
+  const max = Math.max(...data);
+  const pad = 30;
+  // axes
+  ctx.fillStyle = getComputedStyle(document.body).classList.contains('light') ? '#111' : '#fff';
+  ctx.font = '12px Inter';
+  data.forEach((v,i)=>{
+    const bw = (w - pad*2) / data.length * 0.6;
+    const gap = ((w - pad*2) / data.length);
+    const x = pad + i*gap + (gap-bw)/2;
+    const barH = (v/max) * (h - 50);
+    const y = h - pad - barH;
+    // bar
+    const grad = ctx.createLinearGradient(x,y,x,y+barH); grad.addColorStop(0, getComputedStyle(document.body).classList.contains('light') ? '#4a6cf7' : '#00d4ff'); grad.addColorStop(1, getComputedStyle(document.body).classList.contains('light') ? '#7b5cff' : '#6a7cff');
+    ctx.fillStyle = grad; ctx.fillRect(x,y,bw,barH);
+    // label
+    ctx.fillStyle = getComputedStyle(document.body).classList.contains('light') ? '#333' : '#fff';
+    ctx.fillText(['Jan','Feb','Mar','Apr','May'][i], x, h - pad + 14);
+  });
+}
+
+/* ===== Page navigation (SPA) ===== */
+document.querySelectorAll('.menu a').forEach(a=> {
+  a.addEventListener('click', (e)=>{
+    e.preventDefault();
+    document.querySelectorAll('.menu a').forEach(x=> x.classList.remove('active'));
+    a.classList.add('active');
+    const p = a.getAttribute('data-page');
+    showPage(p);
+  });
+});
+
+function showPage(page){
+  document.querySelectorAll('.page').forEach(pg=> pg.style.display = 'none');
+  const el = document.getElementById(page);
+  if(!el){ console.warn('No page',page); return; }
+  el.style.display = 'block';
+  // on showing a page, if login required, prompt
+  if(['wallet','messages','tasks','profile','referral','premium','transactions','support'].includes(page)){
+    if(!currentUser()){ openOverlay('login'); }
+  }
+}
+
+/* ===== Overlay system ===== */
+const overlay = document.getElementById('overlay'); const modalBody = document.getElementById('modalBody');
+function openOverlay(type){
+  overlay.classList.add('active');
+  if(type==='deposit'){
+    modalBody.innerHTML = `<h3>Add Fund (Demo)</h3>
+      <p class="muted">This is a demo deposit (not real).</p>
+      <input id="depAmt" placeholder="Amount" />
+      <input id="depNote" placeholder="Note (optional)" />
+      <div style="margin-top:8px"><button class="btn" onclick="doDeposit()">Deposit</button></div>`;
+  } else if(type==='withdraw'){
+    modalBody.innerHTML = `<h3>Withdraw (Demo)</h3>
+      <p class="muted">Choose method</p>
+      <select id="wdMethod"><option>Bkash</option><option>Nagad</option><option>Bank</option></select>
+      <input id="wdAmt" placeholder="Amount" />
+      <input id="wdAcc" placeholder="Account / Number" />
+      <div style="margin-top:8px"><button class="btn" onclick="doWithdraw()">Request Withdraw</button></div>`;
+  } else if(type==='login'){
+    modalBody.innerHTML = `<h3>Sign in</h3>
+      <input id="li_user" placeholder="username" />
+      <input id="li_pass" placeholder="password" type="password" />
+      <div style="display:flex;gap:8px"><button class="btn" onclick="doLogin()">Sign in</button><button class="btn ghost" onclick="openOverlay('signup')">Register</button></div>
+      <small class="muted">Demo: user/1234 or admin/1234</small>`;
+  } else if(type==='signup'){
+    modalBody.innerHTML = `<h3>Register (Demo)</h3>
+      <input id="su_u" placeholder="username" /><input id="su_name" placeholder="Full name" /><input id="su_p" placeholder="password" type="password" />
+      <div style="margin-top:8px"><button class="btn" onclick="doRegister()">Create account</button></div>`;
+  } else {
+    modalBody.innerHTML = `<h3>${type}</h3><div class="muted">Demo modal</div>`;
+  }
+}
+function closeOverlay(){ overlay.classList.remove('active'); modalBody.innerHTML=''; }
+
+/* ===== Auth actions inside overlay ===== */
+function doLogin(){
+  const u = document.getElementById('li_user').value.trim();
+  const p = document.getElementById('li_pass').value.trim();
+  if(!u||!p){ alert('Fill credentials'); return; }
+  const ok = authLogin(u,p);
+  if(!ok) return alert('Invalid demo credentials');
+  alert('Logged in: ' + ok.name);
+  closeOverlay();
+  renderUI();
+  showPage('dashboard');
+}
+function doRegister(){
+  const u = document.getElementById('su_u').value.trim();
+  const name = document.getElementById('su_name').value.trim() || 'New User';
+  const p = document.getElementById('su_p').value.trim();
+  if(!u||!p){ alert('Provide username & password'); return; }
+  const customs = load('custom_users',[]);
+  if(customs.find(x=>x.username===u) || DEMO_USERS.find(x=>x.username===u)) return alert('Username taken');
+  customs.push({username:u,pass:p,name,role:'user'}); save('custom_users',customs);
+  localStorage.setItem(STORAGE_KEYS.user, JSON.stringify({username:u,name,role:'user'}));
+  alert('Account created (demo): ' + u);
+  closeOverlay(); renderUI(); showPage('dashboard');
+}
+
+/* ===== Deposit / Withdraw / Transactions ===== */
+function doDeposit(){
+  const amt = Number(document.getElementById('depAmt').value || 0);
+  const note = document.getElementById('depNote').value || 'Deposit (demo)';
+  if(!amt || amt<=0) return alert('Enter valid amount');
+  const tx = load(STORAGE_KEYS.tx,[]);
+  tx.push({date:now(), type:'add', amount:amt, note});
+  save(STORAGE_KEYS.tx,tx);
+  // activity
+  const act = load('activity',[]); act.push(`Deposit ৳ ${amt} — ${now()}`); save('activity',act);
+  alert('Deposit added (demo)');
+  closeOverlay(); renderUI();
+}
+function doWithdraw(){
+  const amt = Number(document.getElementById('wdAmt').value || 0);
+  const acc = document.getElementById('wdAcc').value || '';
+  if(!amt || amt<=0) return alert('Enter valid amount');
+  const tx = load(STORAGE_KEYS.tx,[]);
+  tx.push({date:now(), type:'withdraw', amount:amt, note:'Withdraw request to ' + acc, user: currentUser() ? currentUser().username : 'guest'});
+  save(STORAGE_KEYS.tx,tx);
+  const tickets = load(STORAGE_KEYS.tickets,[]); tickets.push({id:Date.now(), title:'Withdraw request', body:`Amount ${amt}`, status:'pending', date:now()}); save(STORAGE_KEYS.tickets,tickets);
+  alert('Withdraw requested (demo)');
+  closeOverlay(); renderUI();
+}
+
+/* ===== Jobs rendering & apply ===== */
+function renderJobs(){
+  const jobs = load(STORAGE_KEYS.jobs,[]);
+  const jobList = document.getElementById('jobList'); if(!jobList) return;
+  jobList.innerHTML = '';
+  jobs.forEach(j=> {
+    const div = document.createElement('div'); div.className = 'card';
+    div.innerHTML = `<h4>${j.title}</h4><div class="muted">Budget ৳ ${j.budget} · ${j.days} days</div><p class="muted small">${j.desc}</p>
+      <div style="margin-top:10px"><button class="btn" onclick="applyJob(${j.id})">Apply</button> <button class="btn ghost" onclick="viewJob(${j.id})">View</button></div>`;
+    jobList.appendChild(div);
+  });
+  const s = document.getElementById('jobSearch');
+  if(s){ s.oninput = ()=> {
+    const q = s.value.trim().toLowerCase();
+    const filtered = load(STORAGE_KEYS.jobs,[]).filter(x=> x.title.toLowerCase().includes(q) || x.desc.toLowerCase().includes(q));
+    jobList.innerHTML=''; filtered.forEach(j=> {
+      const div = document.createElement('div'); div.className = 'card';
+      div.innerHTML = `<h4>${j.title}</h4><div class="muted">Budget ৳ ${j.budget} · ${j.days} days</div><p class="muted small">${j.desc}</p>
+      <div style="margin-top:10px"><button class="btn" onclick="applyJob(${j.id})">Apply</button> <button class="btn ghost" onclick="viewJob(${j.id})">View</button></div>`;
+      jobList.appendChild(div);
+    });
+  } }
+}
+function viewJob(id){ const j = load(STORAGE_KEYS.jobs,[]).find(x=>x.id===id); openOverlay('job'); modalBody.innerHTML = `<button class="close-x" onclick="closeOverlay()">✕</button><h3>${j.title}</h3><p class="muted">Budget ৳${j.budget} · ${j.days}d</p><p>${j.desc}</p><div style="margin-top:8px"><button class="btn" onclick="applyJob(${id})">Apply</button></div>`; }
+function applyJob(id){
+  if(!requireLogin()) return;
+  const j = load(STORAGE_KEYS.jobs,[]).find(x=>x.id===id);
+  const msgs = load(STORAGE_KEYS.messages,[]); msgs.push({from: currentUser().name, text:`Applied to ${j.title}`, time: now()}); save(STORAGE_KEYS.messages,msgs);
+  const tx = load(STORAGE_KEYS.tx,[]); tx.push({date:now(), type:'spend', amount:0, note:`Applied ${j.title}`, user: currentUser().username}); save(STORAGE_KEYS.tx,tx);
+  alert('Applied (demo). A message was sent to client (demo).'); renderUI();
+}
+
+/* ===== Chat & messages ===== */
+function sendChat(){
+  if(!requireLogin()) return;
+  const txt = document.getElementById('chatInp').value.trim();
+  if(!txt) return;
+  const msgs = load(STORAGE_KEYS.messages,[]);
+  msgs.push({from: currentUser().name, text: txt, time: now()});
+  save(STORAGE_KEYS.messages,msgs);
+  document.getElementById('chatInp').value='';
+  renderUI();
+}
+
+/* ===== Tasks ===== */
+function addTask(){ if(!requireLogin()) return; const txt = document.getElementById('taskInput').value.trim(); if(!txt) return alert('Write task'); const arr = load(STORAGE_KEYS.tasks,[]); const t = {id:Date.now(), text:txt, done:false}; arr.push(t); save(STORAGE_KEYS.tasks,arr); document.getElementById('taskInput').value=''; renderUI(); }
+function completeTask(id){ const arr = load(STORAGE_KEYS.tasks,[]); const i = arr.findIndex(x=>x.id===id); if(i>=0){ arr[i].done = true; save(STORAGE_KEYS.tasks,arr); renderUI(); } }
+
+/* ===== Referral & copy ===== */
+function copyRef(){ const el = document.getElementById('referralLink'); navigator.clipboard.writeText(el.value).then(()=> alert('Referral copied!')); }
+
+/* ===== Tickets ===== */
+function submitTicket(){ if(!requireLogin()) return; const t = {id:Date.now(), title: document.getElementById('supportTitle').value || 'No title', body: document.getElementById('supportBody').value || '', status:'open', date: now()}; const arr = load(STORAGE_KEYS.tickets,[]); arr.push(t); save(STORAGE_KEYS.tickets,arr); alert('Ticket submitted (demo)'); renderUI(); }
+
+/* ===== Profile ===== */
+function saveProfile(){ if(!requireLogin()) return; const name = document.getElementById('pfName').value.trim(); const email = document.getElementById('pfEmail').value.trim(); const phone = document.getElementById('pfPhone').value.trim(); const u = currentUser(); if(!u) return alert('login'); u.name = name || u.name; u.email = email; u.phone = phone; localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(u)); alert('Profile saved (demo)'); renderUI(); }
+
+/* ===== Purchase plan (demo) ===== */
+function purchase(plan,price){ if(!requireLogin()) return; const tx = load(STORAGE_KEYS.tx,[]); tx.push({date:now(), type:'purchase', amount:price, note:`Bought ${plan}`, user: currentUser().username}); save(STORAGE_KEYS.tx,tx); alert(`Purchased ${plan} (demo)`); renderUI(); }
+
+/* ===== Notifications & mini features ===== */
+document.getElementById('notifBell').addEventListener('click', ()=> {
+  const nots = load(STORAGE_KEYS.notifs,[]);
+  if(nots.length===0) alert('No notifications');
+  else alert('Notifications:\\n' + nots.join('\\n'));
+  save(STORAGE_KEYS.notifs,[]);
+  renderUI();
+});
+document.getElementById('themeToggle').addEventListener('click', ()=> {
+  document.body.classList.toggle('light');
+  drawChart();
+});
+
+/* ===== Reset demo data ===== */
+function resetDemo(){ if(!confirm('Reset demo data?')) return; localStorage.clear(); initDemo(); alert('Demo reset. Reload page.'); location.reload(); }
+
+/* ===== Logout btn ===== */
+document.getElementById('logoutBtn').addEventListener('click', ()=>{ authLogout(); alert('Logged out (demo)'); renderUI(); showPage('dashboard'); });
+
+/* ===== Spin wheel / Gamification (simple demo) ===== */
+function spinDemo(){
+  if(!requireLogin()) return;
+  const prizes = [10,20,50,100,0,'Try again',5];
+  const r = prizes[Math.floor(Math.random()*prizes.length)];
+  alert('Spin result: ' + r);
+  if(typeof r === 'number' && r>0){
+    const tx = load(STORAGE_KEYS.tx,[]); tx.push({date:now(), type:'income', amount:r, note:'Spin bonus', user:currentUser().username}); save(STORAGE_KEYS.tx,tx);
+    renderUI();
+  }
+}
+
+/* ===== Helper apply theme from settings select ===== */
+function applyTheme(){
+  const val = document.getElementById('themeSel').value;
+  if(val==='light') document.body.classList.add('light'); else document.body.classList.remove('light');
+  drawChart();
+}
+
+/* ===== small utilities ===== */
+function openOverlayLogin(){ openOverlay('login'); }
+function viewTransactions(){ showPage('transactions'); }
+function addDemoNotification(msg){ const arr = load(STORAGE_KEYS.notifs,[]); arr.push(msg); save(STORAGE_KEYS.notifs,arr); renderUI(); }
+
+/* ===== init page on load ===== */
+window.addEventListener('DOMContentLoaded', ()=> {
+  renderUI();
+  // render initial jobs/messages
+  if(load(STORAGE_KEYS.messages,[]).length===0){
+    save(STORAGE_KEYS.messages,[{from:'System',text:'Welcome to CompanyX demo',time:now()}]);
+  }
+  // attach overlay close when clicking outside modal
+  document.getElementById('overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeOverlay(); });
+  // populate transactions table initially
+  renderUI();
+});
+</script>
+</body>
+</html>
