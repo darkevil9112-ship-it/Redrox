@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Premium Incoming App</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+    body{background:#f4f6fb;color:#222;overflow-x:hidden;}
+    header{background:#4a6cf7;color:#fff;padding:15px;font-size:20px;display:flex;justify-content:space-between;align-items:center;}
+    header .menu-btn{font-size:22px;cursor:pointer;}
+    .sidebar{position:fixed;top:0;left:-260px;width:250px;height:100%;background:#2d3e50;color:#fff;transition:0.3s;padding:20px;z-index:999;}
+    .sidebar.active{left:0;}
+    .sidebar h2{text-align:center;margin-bottom:20px;}
+    .sidebar ul{list-style:none;}
+    .sidebar ul li{margin:12px 0;}
+    .sidebar ul li a{color:#fff;text-decoration:none;display:block;padding:8px;border-radius:6px;transition:0.2s;}
+    .sidebar ul li a:hover{background:#4a6cf7;}
+    .dashboard{padding:20px;margin-top:60px;}
+    .cards{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+    .card{background:#fff;padding:15px;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+    .card h3{margin-bottom:10px;}
+    .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000;}
+    .overlay.active{display:flex;}
+    .overlay .content{background:#fff;padding:20px;border-radius:12px;width:90%;max-width:400px;}
+    .overlay .content h2{margin-bottom:15px;}
+    .close-btn{background:#f44336;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;float:right;}
+    @media(max-width:600px){
+      .cards{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="menu-btn">&#9776;</span>
+    <span>Incoming App</span>
+    <span>Profile</span>
+  </header>
+
+  <div class="sidebar" id="sidebar">
+    <h2>Menu</h2>
+    <ul>
+      <li><a href="#" data-section="wallet">Wallet</a></li>
+      <li><a href="#" data-section="salary">Salary</a></li>
+      <li><a href="#" data-section="gift">Gift Code</a></li>
+      <li><a href="#" data-section="withdraw">Withdraw</a></li>
+      <li><a href="#" data-section="transactions">Transactions</a></li>
+      <li><a href="#" data-section="support">Support</a></li>
+    </ul>
+  </div>
+
+  <section class="dashboard">
+    <h2>Dashboard</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Job Wallet</h3>
+        <p>$1200</p>
+      </div>
+      <div class="card">
+        <h3>Free Ear Wallet</h3>
+        <p>$450</p>
+      </div>
+      <div class="card">
+        <h3>Status</h3>
+        <p>Active</p>
+      </div>
+      <div class="card">
+        <h3>Salary</h3>
+        <p>$900/month</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay">
+    <div class="content">
+      <button class="close-btn" id="closeOverlay">X</button>
+      <h2 id="overlayTitle">Section</h2>
+      <div id="overlayBody">Details will load here...</div>
+    </div>
+  </div>
+
+  <script>
+    const sidebar=document.getElementById("sidebar");
+    const menuBtn=document.querySelector(".menu-btn");
+    const overlay=document.getElementById("overlay");
+    const overlayTitle=document.getElementById("overlayTitle");
+    const overlayBody=document.getElementById("overlayBody");
+    const closeOverlay=document.getElementById("closeOverlay");
+
+    menuBtn.addEventListener("click",()=>{sidebar.classList.toggle("active");});
+    document.querySelectorAll(".sidebar ul li a").forEach(link=>{
+      link.addEventListener("click",(e)=>{
+        e.preventDefault();
+        const section=link.getAttribute("data-section");
+        overlay.classList.add("active");
+        if(section==="wallet"){
+          overlayTitle.innerText="Wallet";
+          overlayBody.innerHTML="<p>Your wallet balance: $1200 (Job Wallet), $450 (Free Ear Wallet)</p>";
+        }else if(section==="salary"){
+          overlayTitle.innerText="Salary";
+          overlayBody.innerHTML="<p>Monthly Salary: $900 <br/> Status: Active</p>";
+        }else if(section==="gift"){
+          overlayTitle.innerText="Gift Code";
+          overlayBody.innerHTML="<input type='text' placeholder='Enter Gift Code' style='width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;'><br><br><button style='padding:8px 14px;background:#4a6cf7;color:#fff;border:none;border-radius:6px;'>Submit</button>";
+        }else if(section==="withdraw"){
+          overlayTitle.innerText="Withdraw";
+          overlayBody.innerHTML="<p>Select Method:</p><select style='width:100%;padding:8px;border-radius:6px;'><option>Bank</option><option>Wallet</option></select><br><br><input type='number' placeholder='Amount' style='width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;'><br><br><button style='padding:8px 14px;background:#4a6cf7;color:#fff;border:none;border-radius:6px;'>Withdraw</button>";
+        }else if(section==="transactions"){
+          overlayTitle.innerText="Transactions";
+          overlayBody.innerHTML="<ul><li>Payment #123 - $100</li><li>Withdraw #122 - $50</li><li>Salary Credit - $900</li></ul>";
+        }else if(section==="support"){
+          overlayTitle.innerText="Support";
+          overlayBody.innerHTML="<textarea placeholder='Write your issue...' style='width:100%;height:80px;padding:8px;border:1px solid #ccc;border-radius:6px;'></textarea><br><br><button style='padding:8px 14px;background:#4a6cf7;color:#fff;border:none;border-radius:6px;'>Send</button>";
+        }
+      });
+    });
+    closeOverlay.addEventListener("click",()=>{overlay.classList.remove("active");});
+  </script>
+</body>
+</html>
