@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Redrox — Microjob Dashboard Demo</title>
+  <style>
+    :root{
+      --bg:#f3f6fb;
+      --card:#ffffff;
+      --muted:#9aa6bf;
+      --accent1:#7c3aed;
+      --accent2:#06b6d4;
+      --green:#10b981;
+      --danger:#ef4444;
+      --glass: rgba(255,255,255,0.7);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, system-ui, Arial; background:linear-gradient(180deg,#eef3ff 0%,#f7fbff 100%);color:#0b1220; -webkit-font-smoothing:antialiased}
+    /* top bar */
+    .topbar{height:60px; display:flex;align-items:center;gap:12px;padding:8px 14px;background:linear-gradient(90deg,var(--accent2),var(--accent1)); color:white; position:sticky;top:0;z-index:40}
+    .topbar .menu-btn{width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer}
+    .topbar h1{font-size:16px;margin:0;font-weight:700}
+    .container{display:flex;gap:18px;padding:16px;max-width:1100px;margin:18px auto;width:calc(100% - 32px)}
+    /* drawer / side menu */
+    .drawer{width:330px;flex:0 0 330px;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,0.95),rgba(250,250,255,0.95));box-shadow:0 8px 30px rgba(20,30,80,0.08);padding:14px;position:relative}
+    .profile-card{background:linear-gradient(135deg,var(--accent1),var(--accent2));color:white;border-radius:12px;padding:16px;display:flex;gap:12px;align-items:center;box-shadow:0 8px 30px rgba(92,24,154,0.15)}
+    .profile-card .avatar{width:72px;height:72px;border-radius:50%;background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72"><rect width="100%" height="100%" fill="%23fff"/><text x="50%" y="50%" font-size="28" text-anchor="middle" dy=".35em" fill="%237c3aed">U</text></svg>') center/cover no-repeat}
+    .profile-meta{flex:1}
+    .profile-meta h3{margin:0;font-size:18px}
+    .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.12);font-weight:700;margin-top:8px}
+    .refsmall{font-size:12px;color:rgba(255,255,255,0.9);margin-top:8px;opacity:0.95}
+    .big-buttons{display:flex;gap:10px;margin-top:12px}
+    .big-buttons button{flex:1;padding:12px;border-radius:12px;border:none;color:white;font-weight:700;cursor:pointer}
+    .btn-general{background:linear-gradient(90deg,#60a5fa,#7c3aed)}
+    .btn-pro{background:linear-gradient(90deg,#f97316,#a78bfa)}
+    /* menu list */
+    .menu-section{margin-top:16px}
+    .menu-section h4{margin:12px 0;color:#243b55;font-size:18px}
+    .menu-item{background:#f4f7fb;border-radius:10px;padding:12px;display:flex;align-items:center;gap:12px;margin-bottom:10px;cursor:pointer}
+    .menu-item .ico{width:36px;height:36px;border-radius:8px;background:#eef3ff;display:flex;align-items:center;justify-content:center;color:#334155}
+    .menu-item.logout{background:#fff0f0;color:var(--danger)}
+    /* main area */
+    .main{flex:1;display:flex;flex-direction:column;gap:14px}
+    .card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 6px 20px rgba(19,30,80,0.04)}
+    .balances{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .bal-card{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;background:linear-gradient(90deg,#ffffff,#fbfdff);box-shadow:inset 0 0 0 1px rgba(15,23,42,0.02)}
+    .bal-icon{width:44px;height:44px;border-radius:10px;background:linear-gradient(90deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;color:white;font-weight:800}
+    .ref-box{display:flex;flex-direction:column;gap:8px}
+    .ref-link{width:100%;padding:12px;border-radius:8px;border:1px solid #eef2ff;background:#fbfdff;font-size:14px}
+    .copy-btn{display:inline-block;padding:10px 14px;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white;border:none;cursor:pointer}
+    /* telegram boxes */
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .tg-card{background:linear-gradient(180deg,#f7fbff,#fff);padding:18px;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:8px}
+    .join-btn{padding:10px 16px;border-radius:999px;background:#0f172a;color:white;border:none;cursor:pointer}
+    .floating-call{position:fixed;right:18px;bottom:18px;width:64px;height:64px;border-radius:50%;background:linear-gradient(90deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;color:white;box-shadow:0 10px 30px rgba(6,182,212,0.18);cursor:pointer;z-index:60}
+    /* withdraw form */
+    .form-row{display:flex;gap:10px;margin-top:10px}
+    .form-row input, .form-row select, .form-row textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e7eefc}
+    .small-muted{font-size:13px;color:var(--muted);margin-top:6px}
+    /* responsive */
+    @media(max-width:900px){
+      .container{padding:12px;flex-direction:column;width:100%}
+      .drawer{width:100%;order:2}
+      .main{order:1}
+      .balances{grid-template-columns:repeat(1,1fr)}
+      .grid-2{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="menu-btn" id="openDrawer" title="Open menu">☰</div>
+    <h1>Best Microjob & Freelancing Site</h1>
+    <div style="margin-left:auto;font-weight:700;opacity:0.95">Demo • Redrox</div>
+  </div>
+
+  <div class="container">
+    <!-- Drawer / Side -->
+    <aside class="drawer" id="drawer">
+      <div class="profile-card">
+        <div class="avatar" id="avatar"></div>
+        <div class="profile-meta">
+          <h3 id="pname">MD Siam</h3>
+          <div class="badge" id="vbadge" style="background:rgba(255,255,255,0.12)">UNVERIFIED</div>
+          <div class="refsmall" id="refinfo">Ref ID: <strong id="refid">74154877469</strong> • Joined: Sep 03, 2025</div>
+          <div class="big-buttons">
+            <button class="btn-general" onclick="alert('Open General Jobs')">General Job</button>
+            <button class="btn-pro" onclick="alert('Open Pro Jobs')">Pro Job</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <h4>Home selection</h4>
+        <div class="menu-item" onclick="showPage('dashboard')">
+          <div class="ico">🏠</div><div>Dashboard</div>
+        </div>
+        <div class="menu-item" onclick="alert('Buy Gmail API')">
+          <div class="ico">✉️</div><div>Buy Gmail Api</div>
+        </div>
+        <div class="menu-item" onclick="showPage('profile')">
+          <div class="ico">👤</div><div>Profile</div>
+        </div>
+        <div class="menu-item" onclick="alert('Gift Code')">
+          <div class="ico">🎁</div><div>Gift Code</div>
+        </div>
+        <div class="menu-item" onclick="showPage('salary')">
+          <div class="ico">💵</div><div>Salary Apply</div>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <h4>Withdraw Selection</h4>
+        <div class="menu-item" onclick="openWithdraw()">
+          <div class="ico">🏧</div><div>Withdraw</div>
+        </div>
+        <div class="menu-item" onclick="showPage('payment-method')">
+          <div class="ico">⚙️</div><div>Payment Method Setup</div>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <h4>Working Selection</h4>
+        <div class="menu-item" onclick="showPage('myjob')">
+          <div class="ico">💼</div><div>My Job</div>
+        </div>
+        <div class="menu-item" onclick="showPage('gmailtask')">
+          <div class="ico">📧</div><div>Gmail Task</div>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <h4>History</h4>
+        <div class="menu-item" onclick="showPage('jobhistory')">
+          <div class="ico">↺</div><div>Job History</div>
+        </div>
+        <div class="menu-item" onclick="showPage('gmailhistory')">
+          <div class="ico">↺</div><div>Gmail History</div>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <h4>Team selection</h4>
+        <div class="menu-item" onclick="showPage('projob')">
+          <div class="ico">⭐</div><div>Pro Job</div>
+        </div>
+        <div class="menu-item" onclick="showPage('myteam')">
+          <div class="ico">👥</div><div>My Team</div>
+        </div>
+        <div class="menu-item" onclick="openHelpline()">
+          <div class="ico">🎧</div><div>Helpline</div>
+        </div>
+        <div class="menu-item logout" onclick="doLogout()">
+          <div class="ico">⤴</div><div>Logout</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main" id="main">
+      <!-- Dashboard -->
+      <section class="card" id="page-dashboard">
+        <h2 style="margin:0 0 8px 0">Dashboard</h2>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+          <div style="flex:1">
+            <div style="background:linear-gradient(90deg,#e6f0ff,#fff);padding:14px;border-radius:12px;margin-bottom:12px">
+              <strong>বতর্মান বয়স</strong>
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <div style="background:white;padding:8px;border-radius:10px;text-align:center;min-width:70px">13<br><small style="color:var(--muted)">মাস</small></div>
+                <div style="background:white;padding:8px;border-radius:10px;text-align:center;min-width:70px">08<br><small style="color:var(--muted)">দিন</small></div>
+                <div style="background:white;padding:8px;border-radius:10px;text-align:center;min-width:70px">14<br><small style="color:var(--muted)">ঘন্টা</small></div>
+                <div style="background:white;padding:8px;border-radius:10px;text-align:center;min-width:70px">26<br><small style="color:var(--muted)">মিনিট</small></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 style="margin:0 0 8px 0">Your Wallets — Balances & summary</h3>
+              <div class="balances">
+                <div class="bal-card">
+                  <div class="bal-icon">💼</div>
+                  <div><div style="font-weight:700">170.00</div><div class="small-muted">Jobs Balance</div></div>
+                </div>
+                <div class="bal-card">
+                  <div class="bal-icon" style="background:linear-gradient(90deg,#10b981,#34d399)">👥</div>
+                  <div><div style="font-weight:700">0.00</div><div class="small-muted">Referral Income</div></div>
+                </div>
+                <div class="bal-card">
+                  <div class="bal-icon" style="background:linear-gradient(90deg,#fb7185,#f97316)">✉️</div>
+                  <div><div style="font-weight:700">0.00</div><div class="small-muted">Gmail Income</div></div>
+                </div>
+                <div class="bal-card">
+                  <div class="bal-icon" style="background:linear-gradient(90deg,#f59e0b,#fde68a)">💳</div>
+                  <div><div style="font-weight:700">0.00</div><div class="small-muted">Salary Income</div></div>
+                </div>
+              </div>
+
+              <div style="margin-top:14px">
+                <h4 style="margin:0 0 8px 0">Your Referral Link</h4>
+                <div class="ref-box">
+                  <input class="ref-link" id="refLink" readonly value="https://esayfreelancer.com/register?by=74154877469">
+                  <div style="display:flex;gap:10px;align-items:center">
+                    <button class="copy-btn" onclick="copyLink()">📋 Copy</button>
+                    <div class="small-muted">Share & earn referral commission</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="card">
+              <h3 style="margin:0 0 12px 0">Notice</h3>
+              <p class="small-muted" style="margin:0">আপনার একাউন্ট ভেরিফাইড নয়। অনুগ্রহ করে ২৪ ঘন্টার মধ্যে ভেরিফাই করুন। ভেরিফিকেশন না করলে একাউন্ট ফেক হিসেবে গণ্য হবে।</p>
+              <div style="margin-top:12px"><button class="copy-btn" onclick="alert('Open verification flow')">এখনই ভেরিফাই করুন</button></div>
+            </div>
+
+          </div>
+
+          <!-- right column: telegram / join -->
+          <aside style="width:320px;display:flex;flex-direction:column;gap:12px">
+            <div class="card">
+              <h3 style="margin:0 0 8px 0">Quick Actions</h3>
+              <button class="copy-btn" style="width:100%" onclick="showPage('payment-method')">Payment Method</button>
+            </div>
+
+            <div class="tg-card">
+              <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48'><circle cx='24' cy='24' r='24' fill='%2306b6d4'/></svg>" alt="" style="width:48px">
+              <div>Official Telegram Group</div>
+              <button class="join-btn" onclick="alert('Open Telegram Group')">JOIN GROUP</button>
+            </div>
+
+            <div class="tg-card">
+              <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48'><circle cx='24' cy='24' r='24' fill='%237c3aed'/></svg>" alt="" style="width:48px">
+              <div>Official Telegram Channel</div>
+              <button class="join-btn" onclick="alert('Open Telegram Channel')">JOIN CHANNEL</button>
+            </div>
+          </aside>
+
+        </div>
+      </section>
+
+      <!-- Profile page -->
+      <section class="card" id="page-profile" style="display:none">
+        <h2>Profile</h2>
+        <div style="display:flex;gap:16px;align-items:center">
+          <div style="width:96px;height:96px;border-radius:10px;background:linear-gradient(90deg,var(--accent1),var(--accent2))"></div>
+          <div>
+            <h3 id="prof-name">MD Siam</h3>
+            <div class="small-muted">Dhaka, Bangladesh</div>
+            <div style="margin-top:8px"><button class="copy-btn" onclick="alert('Edit profile')">Edit profile</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Salary page -->
+      <section class="card" id="page-salary" style="display:none">
+        <h2>Salary Apply</h2>
+        <p class="small-muted">Apply for monthly salary here. Minimum threshold must be met.</p>
+        <div style="margin-top:8px" class="form-row">
+          <input placeholder="Amount to apply (৳)">
+          <button class="copy-btn">Apply</button>
+        </div>
+      </section>
+
+      <!-- Payment method page -->
+      <section class="card" id="page-payment-method" style="display:none">
+        <h2>Payment Method Setup</h2>
+        <div class="small-muted">Add your payout methods (bKash, Nagad, Rocket, Bank)</div>
+        <div style="margin-top:8px" class="form-row">
+          <select id="pmethod">
+            <option value="bkash">bKash</option>
+            <option value="nagad">Nagad</option>
+            <option value="rocket">Rocket/DBBL</option>
+            <option value="bank">Bank</option>
+          </select>
+          <input id="pnum" placeholder="Enter number / account">
+        </div>
+        <div style="margin-top:10px"><button class="copy-btn" onclick="savePayment()">Save method</button></div>
+      </section>
+
+      <!-- My Job -->
+      <section class="card" id="page-myjob" style="display:none">
+        <h2>My Job</h2>
+        <div id="myjob-list"></div>
+      </section>
+
+      <!-- Gmail Task -->
+      <section class="card" id="page-gmailtask" style="display:none">
+        <h2>Gmail Task</h2>
+        <p class="small-muted">Demo tasks to earn small amounts</p>
+        <div id="gmailtasks"></div>
+      </section>
+
+      <!-- Histories -->
+      <section class="card" id="page-jobhistory" style="display:none">
+        <h2>Job History</h2>
+        <div id="jobHistory"></div>
+      </section>
+      <section class="card" id="page-gmailhistory" style="display:none">
+        <h2>Gmail History</h2>
+        <div id="gmailHistory"></div>
+      </section>
+
+      <!-- Pro job / Team -->
+      <section class="card" id="page-projob" style="display:none">
+        <h2>Pro Job</h2>
+        <p class="small-muted">Premium tasks for Pro users only</p>
+      </section>
+      <section class="card" id="page-myteam" style="display:none">
+        <h2>My Team</h2>
+        <p class="small-muted">Your referral members & stats</p>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Floating call -->
+  <div class="floating-call" onclick="alert('Call support')">📞</div>
+
+  <script>
+    // small SPA helper
+    function hideAllPages(){
+      document.querySelectorAll('[id^="page-"]').forEach(s=>s.style.display='none');
+    }
+    function showPage(name){
+      hideAllPages();
+      const el = document.getElementById('page-' + name);
+      if(el) el.style.display='block';
+      // close drawer on small screens
+      if(window.innerWidth < 900) window.scrollTo({top:0, behavior:'smooth'});
+    }
+
+    // open withdraw modal as a simple prompt
+    function openWithdraw(){
+      const amount = prompt('Enter withdraw amount (৳):','100');
+      if(!amount) return;
+      const method = prompt('Enter payment method (bKash/Nagad/Rocket/Bank):','bKash');
+      if(!method) return;
+      alert(`Withdraw request submitted:\nAmount: ${amount}\nMethod: ${method}\n( demo only )`);
+    }
+
+    function openHelpline(){
+      alert('Open help ticket or chat (demo).');
+    }
+
+    function doLogout(){
+      if(confirm('Logout?')) alert('Logged out (demo).');
+    }
+
+    function copyLink(){
+      const el = document.getElementById('refLink');
+      el.select ? el.select() : null;
+      try {
+        navigator.clipboard && navigator.clipboard.writeText(el.value);
+        alert('Referral link copied to clipboard!');
+      } catch(e){
+        prompt('Copy the link manually', el.value);
+      }
+    }
+
+    function savePayment(){
+      const m = document.getElementById('pmethod').value;
+      const n = document.getElementById('pnum').value;
+      if(!n) return alert('Enter number');
+      alert('Payment method saved: ' + m + ' - ' + n + ' (demo)');
+    }
+
+    // drawer open on small screens
+    const drawer = document.getElementById('drawer');
+    const openDrawer = document.getElementById('openDrawer');
+    openDrawer.addEventListener('click', ()=>{
+      // simple toggle height for mobile
+      if(window.innerWidth < 900){
+        if(drawer.style.position !== 'fixed'){
+          drawer.style.position='fixed';
+          drawer.style.left='8px';
+          drawer.style.right='8px';
+          drawer.style.top='74px';
+          drawer.style.zIndex=90;
+        } else {
+          drawer.style.position='';
+          drawer.style.left='';
+          drawer.style.right='';
+          drawer.style.top='';
+        }
+      } else {
+        drawer.scrollIntoView({behavior:'smooth'});
+      }
+    });
+
+    // render demo lists
+    const myJobs = ['Job A - completed 2m','Job B - pending','Job C - completed 5m'];
+    const gmailTasks = ['Verify email 1','Open link 2','Copy text 3'];
+
+    function renderList(id, arr){
+      const root = document.getElementById(id);
+      root.innerHTML='';
+      arr.forEach(i=>{
+        const d = document.createElement('div');
+        d.style.padding='10px'; d.style.borderRadius='10px'; d.style.background='#fbfdff'; d.style.marginBottom='8px';
+        d.textContent = i;
+        root.appendChild(d);
+      });
+    }
+    renderList('myjob-list', myJobs);
+    renderList('gmailtasks', gmailTasks);
+    renderList('jobHistory', ['Job A paid ৳50','Job B rejected']);
+    renderList('gmailHistory', ['Gmail task - success','Gmail task - failed']);
+
+    // on load, show dashboard
+    showPage('dashboard');
+
+    // responsive: if screen is narrow, drawer placed below by CSS. No zooming.
+    // (frontend demo only)
+  </script>
+</body>
+</html>
