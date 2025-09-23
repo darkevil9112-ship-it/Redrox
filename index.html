@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CompanyName — Incoming App (Premium Demo)</title>
+<meta name="description" content="CompanyName Incoming App — premium all-in-one demo. Login, Dashboard, Tools, Wallet, Vault, Marketplace, Chat, Notifications.">
+
+<!-- Inline CSS — premium theme (dark/light) -->
+<style>
+  :root{
+    --bg:#0b1020; --panel:#0f1724; --muted:#94a3b8; --accent:#6ae3ff; --accent2:#7c3aed;
+    --glass: rgba(255,255,255,0.03); --radius:12px;
+  }
+  /* light theme tokens (will switch when body.light-mode) */
+  body.light-mode{ --bg:#f6f8fb; --panel:#ffffff; --muted:#556073; --accent:#1f6feb; --accent2:#8b5cf6; --glass: rgba(2,6,23,0.02); color:#0b1220;}
+  *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#071226);color:#e6f7ff}
+  .app{display:flex;min-height:100vh}
+  /* SIDEBAR */
+  .sidebar{width:260px;background:linear-gradient(180deg,var(--panel),rgba(0,0,0,0.05));padding:20px;position:fixed;left:0;top:0;bottom:0;overflow:auto;border-right:1px solid rgba(255,255,255,0.03)}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .brand img{width:48px;height:48px;border-radius:10px;background:#fff;padding:4px}
+  .brand h1{font-size:18px;margin:0}
+  .muted{color:var(--muted);font-size:13px}
+  nav.menu{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+  nav.menu a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:inherit;text-decoration:none;border:1px solid transparent}
+  nav.menu a:hover{background:linear-gradient(90deg,rgba(255,255,255,0.02),rgba(0,0,0,0.02));transform:translateY(-1px)}
+  nav.menu a.active{background:linear-gradient(90deg,var(--accent2),var(--accent));color:#021; font-weight:700}
+  .small{font-size:13px;color:var(--muted)}
+  .sidebar .bottom{margin-top:24px;border-top:1px dashed rgba(255,255,255,0.03);padding-top:14px}
+  .logout{color:#ff7b7b;cursor:pointer}
+
+  /* MAIN CONTENT */
+  .main{margin-left:260px;flex:1;padding:22px;overflow:auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+  .top-actions{display:flex;gap:8px;align-items:center}
+  .pill{background:var(--glass);padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.03)}
+  .badge{background:#ff4d4f;color:#fff;padding:4px 8px;border-radius:999px;font-size:12px}
+
+  /* HERO / CARDS */
+  .hero{display:flex;gap:18px;align-items:center;justify-content:space-between;padding:18px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));box-shadow:0 8px 30px rgba(2,6,23,0.5)}
+  .hero-left h2{margin:0;font-size:20px}
+  .cta{display:flex;gap:8px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:16px}
+  .card{background:var(--panel);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 24px rgba(2,6,23,0.45)}
+  .card h3{margin:0 0 8px 0}
+  .big{font-size:24px;font-weight:700}
+  .field{display:block;width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;margin:8px 0}
+
+  /* small utilities */
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  button.btn{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#021;border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}
+  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 12px}
+  .hidden{display:none}
+  ul.list{list-style:none;padding:0;margin:0}
+  ul.list li{padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.03)}
+  .small-muted{font-size:13px;color:var(--muted)}
+
+  /* responsive */
+  @media(max-width:900px){
+    .sidebar{position:relative;width:100%;height:auto;display:flex;overflow:auto}
+    .main{margin-left:0}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" role="navigation" aria-label="Main menu">
+    <div class="brand">
+      <!-- small dataURI white icon placeholder -->
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAQCAYAAAD9lJw3AAAACXBIWXMAAAsSAAALEgHS3X78AAABV0lEQVR4nO2WvUoDQRBG34ZIRt4Aqk0u4qQJwi3sA0o1o0gk+QJmI3rY2e4Av0JroBrqGQlJv6gT8B1w5kN6qFv+ZxkE6M0v78fN7c7b2Q0s8cPM8zvP0v2ZvZ2d2iQqFQqFQqGgH8Q8Q1a5h+qYwF9o2nXqd0S3pUoZtA0D3o4aQZ4F2w3kW3g8q5j4G6QGfA1Yz9g8vQqgH+Y8jtg7mZ9gCN8eZVv2e0Z1q9VbVbq9Vq9Uq3y6fQ6nU6n06n0+n0+n0ej0ep1Oq9VqlWr1afr9Xo9Ho9Hofr9Xq9Vq9Vxuz0QvV5Pq9Vqv1er1er1eq9Wq/3+q9Vnq9Vqv16v3y+q9Vqv16v1er1er1es9nq9Xq9Xq9Xq9Xq9Xq9Xq9Xq9Xq9Xq9/3YBh0w6b3WDn8AAAAASUVORK5CYII=" alt="logo">
+      <div>
+        <h1>CompanyName</h1>
+        <div class="muted small-muted">Premium Incoming App</div>
+      </div>
+    </div>
+
+    <nav class="menu" aria-label="Applications menu">
+      <a href="#home" class="active" data-target="home">🏠 হোম</a>
+      <a href="#login" data-target="login">🔑 লগইন / রেজিস্টার</a>
+      <a href="#dashboard" data-target="dashboard">📊 ড্যাশবোর্ড</a>
+      <a href="#calculator" data-target="calculator">🧮 ক্যালকুলেটর</a>
+      <a href="#converter" data-target="converter">📏 কনভার্টার</a>
+      <a href="#currency" data-target="currency">💱 কারেন্সি</a>
+      <a href="#wallet" data-target="wallet">💰 ওয়ালেট</a>
+      <a href="#tasks" data-target="tasks">✅ টাস্ক</a>
+      <a href="#notes" data-target="notes">📝 নোটস</a>
+      <a href="#todo" data-target="todo">📌 টু-ডু</a>
+      <a href="#media" data-target="media">🎵 মিডিয়া</a>
+      <a href="#market" data-target="market">🛒 মার্কেটপ্লেস</a>
+      <a href="#leader" data-target="leader">🏆 লিডারবোর্ড</a>
+      <a href="#news" data-target="news">📰 নিউজ</a>
+      <a href="#weather" data-target="weather">⛅ আবহাওয়া</a>
+      <a href="#privacy" data-target="privacy">🔒 ভল্ট</a>
+      <a href="#settings" data-target="settings">⚙ সেটিংস</a>
+      <a href="#about" data-target="about">ℹ অ্যাবাউট</a>
+      <div class="bottom">
+        <div class="small-muted" style="padding:10px 0">Logged: <b id="miniUser">Guest</b></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="ghost" id="themeToggleSmall">থিম</button>
+          <button class="ghost" id="logoutBtn" style="display:none">লগআউট</button>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" role="main">
+    <div class="topbar">
+      <div>
+        <div class="pill">CompanyName — Incoming Platform</div>
+        <div class="small-muted">Premium demo — frontend only</div>
+      </div>
+      <div class="top-actions">
+        <div class="pill">User: <span id="topUser">Guest</span></div>
+        <button class="pill" id="notifBtn">🔔 Notifications <span id="notifCount" class="badge hidden">0</span></button>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <section id="home" class="card panel">
+      <div class="hero" style="display:flex;gap:18px;align-items:center">
+        <div class="hero-left" style="flex:1">
+          <h2>CompanyName এ স্বাগতম</h2>
+          <p class="muted">একটি প্রিমিয়াম incoming app demo — সকল টুল, ওয়ালেট, প্রাইভেসি ভল্ট, মার্কেটপ্লেস এবং আরও অনেক কিছু এক জায়গায়।</p>
+          <div class="row cta" style="margin-top:10px">
+            <button class="btn" id="goDashboard">ড্যাশবোর্ড দেখুন</button>
+            <button class="ghost" id="goLogin">লগইন করুন</button>
+          </div>
+        </div>
+        <div style="width:320px;">
+          <div style="background:linear-gradient(135deg,var(--accent),var(--accent2));padding:14px;border-radius:12px;color:#021">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div class="small-muted">Total Users</div><div class="big" id="statUsers">1,024</div></div>
+              <div><div class="small-muted">Today Earning</div><div class="big">৳ 5,200</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid cards">
+        <div class="card">
+          <h3>Fast Tools</h3>
+          <p class="small-muted">Calculator, Converter, QR, File tools — দ্রুত এবং নিরাপদ।</p>
+        </div>
+        <div class="card">
+          <h3>Wallet & Rewards</h3>
+          <p class="small-muted">Balance, Transactions, Withdraw (demo UI).</p>
+        </div>
+        <div class="card">
+          <h3>Privacy Vault</h3>
+          <p class="small-muted">Hidden folder + calculator disguise (demo pin 0000).</p>
+        </div>
+        <div class="card">
+          <h3>PWA Ready</h3>
+          <p class="small-muted">Manifest & SW placeholder — later connect to backend for push.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOGIN -->
+    <section id="login" class="card panel hidden">
+      <h3>🔑 লগইন / রেজিস্টার</h3>
+      <div style="max-width:560px">
+        <label class="small-muted">ইমেইল / ইউজারনেম</label>
+        <input id="inputUser" class="field" placeholder="admin">
+        <label class="small-muted">পাসওয়ার্ড</label>
+        <input id="inputPass" class="field" type="password" placeholder="1234">
+        <div class="form-row" style="margin-top:8px">
+          <button class="btn" id="btnLogin">Sign in</button>
+          <button class="ghost" id="btnRegister">Register (demo)</button>
+          <button class="ghost" id="btnFill">Fill demo</button>
+        </div>
+        <p id="loginStatus" class="small-muted"></p>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="card panel hidden">
+      <h3>📊 Dashboard</h3>
+      <div class="grid">
+        <div class="card">
+          <h3>Profile</h3>
+          <div id="profileBlock">
+            <div class="small-muted">Name</div><div id="profileName">Guest</div>
+            <div class="small-muted">Email</div><div id="profileEmail" class="muted"></div>
+          </div>
+          <div style="margin-top:8px"><button class="btn" id="editProfile">Edit Profile</button></div>
+        </div>
+
+        <div class="card">
+          <h3>Balance</h3>
+          <div class="big" id="balanceMain">৳ 0</div>
+          <div style="margin-top:8px" class="row">
+            <button class="btn" onclick="addBalance(200)">Add ৳200</button>
+            <button class="ghost" onclick="spendBalance(100)">Spend ৳100</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Transactions</h3>
+          <div id="txBox" style="max-height:160px;overflow:auto"></div>
+        </div>
+
+        <div class="card">
+          <h3>Referrals</h3>
+          <input id="referralLink" class="field" readonly value="https://example.com/?ref=DEMO123">
+          <div class="row"><button class="btn" id="copyRefBtn">Copy</button><button class="ghost" id="shareRef">Share</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALCULATOR -->
+    <section id="calculator" class="card panel hidden">
+      <h3>🧮 Calculator</h3>
+      <div class="row">
+        <input id="aVal" class="field" type="number" placeholder="Number A">
+        <input id="bVal" class="field" type="number" placeholder="Number B">
+      </div>
+      <div class="tool-buttons" style="margin-top:8px">
+        <button class="btn" onclick="doCalc('+')">+</button>
+        <button class="btn" onclick="doCalc('-')">-</button>
+        <button class="btn" onclick="doCalc('*')">*</button>
+        <button class="btn" onclick="doCalc('/')">/</button>
+        <button class="ghost" onclick="document.getElementById('resultCalc').innerText='-'">Clear</button>
+      </div>
+      <p>Result: <span id="resultCalc" class="big">-</span></p>
+    </section>
+
+    <!-- CONVERTER -->
+    <section id="converter" class="card panel hidden">
+      <h3>📏 Unit & Currency Converter</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="small-muted">Km → Miles</label>
+          <input id="kmVal" class="field" type="number" placeholder="Kilometers" oninput="kmToMiles()">
+          <div class="small-muted">Miles: <b id="milesOut">0</b></div>
+        </div>
+        <div>
+          <label class="small-muted">BDT → USD (demo)</label>
+          <input id="bdtVal" class="field" type="number" placeholder="BDT" oninput="bdtToUsd()">
+          <div class="small-muted">USD: <b id="usdOut">0</b></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WALLET -->
+    <section id="wallet" class="card panel hidden">
+      <h3>💰 Wallet</h3>
+      <div class="small-muted">Current Balance</div>
+      <div class="big" id="walletMain">৳ 0</div>
+      <div style="margin-top:8px" class="form-row">
+        <input id="walletAmount" class="field" type="number" placeholder="Amount">
+        <button class="btn" onclick="walletAdd()">Add</button>
+        <button class="ghost" onclick="walletSpend()">Spend</button>
+      </div>
+      <div style="margin-top:10px">
+        <h4>Transactions</h4>
+        <div id="walletTx" style="max-height:160px;overflow:auto"></div>
+      </div>
+    </section>
+
+    <!-- TASKS -->
+    <section id="tasks" class="card panel hidden">
+      <h3>✅ Tasks</h3>
+      <div class="row">
+        <input id="taskIn" class="field" placeholder="New task">
+        <button class="btn" onclick="addTask()">Add Task</button>
+      </div>
+      <ul id="taskList" class="list" style="margin-top:12px"></ul>
+    </section>
+
+    <!-- NOTES -->
+    <section id="notes" class="card panel hidden">
+      <h3>📝 Notes</h3>
+      <textarea id="noteIn" class="field" placeholder="Write note..."></textarea>
+      <div class="row"><button class="btn" onclick="saveNote()">Save Note</button><button class="ghost" onclick="clearAllNotes()">Clear</button></div>
+      <ul id="notesList" class="list" style="margin-top:12px"></ul>
+    </section>
+
+    <!-- TODO -->
+    <section id="todo" class="card panel hidden">
+      <h3>📌 To-Do</h3>
+      <div class="row">
+        <input id="todoIn" class="field" placeholder="Todo item">
+        <button class="btn" onclick="addTodoItem()">Add</button>
+      </div>
+      <ul id="todoList" class="list" style="margin-top:12px"></ul>
+    </section>
+
+    <!-- MEDIA -->
+    <section id="media" class="card panel hidden">
+      <h3>🎵 Media</h3>
+      <p class="small-muted">Demo audio/video — replace src with your files in repo for real media.</p>
+      <audio controls style="width:100%">
+        <source src="" type="audio/mpeg">
+        Your browser does not support audio.
+      </audio>
+      <br><br>
+      <video controls width="480">
+        <source src="" type="video/mp4">
+        Your browser does not support video.
+      </video>
+    </section>
+
+    <!-- MARKETPLACE -->
+    <section id="market" class="card panel hidden">
+      <h3>🛒 Marketplace (Demo)</h3>
+      <div class="grid">
+        <div class="card">
+          <h4>Promotion Pack</h4>
+          <p class="small-muted">৳ 250 — Featured banner</p>
+          <div class="row"><button class="btn" onclick="mockBuy('Promotion Pack',250)">Buy</button></div>
+        </div>
+        <div class="card">
+          <h4>Highlight</h4>
+          <p class="small-muted">৳ 80 — Highlight spot</p>
+          <div class="row"><button class="btn" onclick="mockBuy('Highlight',80)">Buy</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEADERBOARD -->
+    <section id="leader" class="card panel hidden">
+      <h3>🏆 Leaderboard</h3>
+      <ol id="leaderList">
+        <li>user_a — 150 pts</li>
+        <li>user_b — 120 pts</li>
+        <li>you — <span id="yourPoints">50</span> pts</li>
+      </ol>
+    </section>
+
+    <!-- NEWS -->
+    <section id="news" class="card panel hidden">
+      <h3>📰 News & Updates</h3>
+      <ul id="newsList">
+        <li>CompanyName launched Incoming App demo.</li>
+        <li>New: Wallet and Marketplace UI added.</li>
+      </ul>
+    </section>
+
+    <!-- WEATHER -->
+    <section id="weather" class="card panel hidden">
+      <h3>⛅ Weather (Demo)</h3>
+      <div>City: <b id="weatherCity">Dhaka</b></div>
+      <div>Temp: <b id="weatherTemp">30°C</b></div>
+      <div>Condition: <b id="weatherCond">Sunny</b></div>
+    </section>
+
+    <!-- PRIVACY VAULT -->
+    <section id="privacy" class="card panel hidden">
+      <h3>🔒 Privacy Vault</h3>
+      <p class="small-muted">Vault uses PIN demo. PIN: <b>0000</b></p>
+      <input id="vaultPin" class="field" type="password" placeholder="Enter PIN to unlock">
+      <div class="row"><button class="btn" onclick="tryUnlock()">Unlock</button><button class="ghost" onclick="showCalcVault()">Calculator Mode</button></div>
+      <div id="vaultArea" class="card small hidden" style="margin-top:10px">🔐 Vault contents: (demo files)</div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settings" class="card panel hidden">
+      <h3>⚙ Settings</h3>
+      <label class="small-muted">Company name (display)</label>
+      <input id="companyName" class="field" placeholder="CompanyName">
+      <label class="small-muted">Theme</label>
+      <select id="themeSelect" class="field"><option value="dark">Dark (default)</option><option value="light">Light</option></select>
+      <div class="row"><button class="btn" onclick="saveCompanySettings()">Save</button><button class="ghost" onclick="resetCompanySettings()">Reset</button></div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="card panel hidden">
+      <h3>ℹ About</h3>
+      <p>CompanyName — Premium incoming app demo built for showcasing multi-tools and a company-like UI. Frontend demo only.</p>
+    </section>
+
+    <!-- FOOTER -->
+    <footer style="margin-top:20px;color:var(--muted);font-size:13px">© 2025 CompanyName — Demo. Replace placeholders with your real assets & backend.</footer>
+  </main>
+</div>
+
+<!-- Inline JS — demo logic -->
+<script>
+/* ========= Utilities ========= */
+const byId = id => document.getElementById(id);
+const qs = sel => document.querySelector(sel);
+const qsa = sel => document.querySelectorAll(sel);
+
+/* ====== Navigation single-page behavior ====== */
+qsa('.menu a').forEach(a=>{
+  a.addEventListener('click', e=>{
+    e.preventDefault();
+    const target = a.getAttribute('data-target');
+    if(!target) return;
+    // hide all panels
+    document.querySelectorAll('.panel').forEach(p=>p.classList.add('hidden'));
+    // show chosen
+    const el = byId(target);
+    if(el) el.classList.remove('hidden');
+    // mark active
+    document.querySelectorAll('.menu a').forEach(x=>x.classList.remove('active'));
+    a.classList.add('active');
+    // small scroll to top
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+
+/* ====== Theme & Company name ====== */
+function applyCompanyName(){
+  const name = localStorage.getItem('company_name') || 'CompanyName';
+  document.querySelectorAll('.brand h1').forEach(e=>e.textContent = name);
+  qs('.topbar .pill') && (qs('.topbar .pill').textContent = name + ' — Incoming Platform');
+  document.title = name + ' — Incoming App (Demo)';
+}
+applyCompanyName();
+const themeSelect = byId('themeSelect');
+function applyThemeFromStore(){
+  const t = localStorage.getItem('app_theme') || 'dark';
+  if(t === 'light') document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode');
+  if(themeSelect) themeSelect.value = t;
+}
+applyThemeFromStore();
+byId('themeToggleSmall').addEventListener('click', ()=>{
+  document.body.classList.toggle('light-mode');
+  localStorage.setItem('app_theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+});
+
+/* ====== Login (demo) ====== */
+const inputUser = byId('inputUser');
+const inputPass = byId('inputPass');
+const btnLogin = byId('btnLogin');
+const loginStatus = byId('loginStatus');
+btnLogin && btnLogin.addEventListener('click', (e)=>{
+  const u = inputUser.value.trim();
+  const p = inputPass.value.trim();
+  if(u === 'admin' && p === '1234'){
+    const user = {name:'Admin User', email:'admin@example.com'};
+    localStorage.setItem('incoming_user', JSON.stringify(user));
+    loginStatus.textContent = 'Login successful — welcome ' + user.name;
+    afterLogin(user);
+  } else {
+    loginStatus.textContent = 'Invalid credentials (demo). Use admin / 1234';
+  }
+});
+byId('btnFill').addEventListener('click', ()=>{ inputUser.value='admin'; inputPass.value='1234';});
+byId('btnRegister').addEventListener('click', ()=>{ alert('Register (demo): filling demo account.'); inputUser.value='admin'; inputPass.value='1234'; });
+
+function afterLogin(user){
+  // show dashboard, hide login
+  document.querySelectorAll('.panel').forEach(p=>p.classList.add('hidden'));
+  byId('dashboard').classList.remove('hidden');
+  document.querySelectorAll('.menu a').forEach(a=>a.classList.remove('active'));
+  document.querySelector('.menu a[data-target="dashboard"]').classList.add('active');
+  byId('topUser').textContent = user.name;
+  byId('miniUser').textContent = user.name;
+  byId('profileName').textContent = user.name;
+  byId('profileEmail').textContent = user.email;
+  byId('logoutBtn').style.display = 'inline-block';
+  // store
+  localStorage.setItem('incoming_user', JSON.stringify(user));
+}
+
+/* auto login if stored */
+(function initAuth(){
+  const u = JSON.parse(localStorage.getItem('incoming_user') || 'null');
+  if(u){ afterLogin(u); }
+})();
+
+/* logout */
+byId('logoutBtn').addEventListener('click', ()=>{
+  localStorage.removeItem('incoming_user');
+  alert('Logged out (demo).');
+  location.reload();
+});
+
+/* ====== Dashboard & Wallet logic ====== */
+let wallet = parseFloat(localStorage.getItem('incoming_wallet') || '1000');
+function refreshWallet(){
+  byId('walletMain').innerText = '৳ ' + wallet;
+  byId('walletMain') && (byId('walletMain').innerText = '৳ ' + wallet);
+  byId('balanceMain') && (byId('balanceMain').innerText = '৳ ' + wallet);
+  byId('walletMain') && (byId('walletMain').innerText = '৳ ' + wallet);
+}
+refreshWallet();
+
+function addBalance(amount=100){
+  wallet += amount;
+  localStorage.setItem('incoming_wallet', wallet);
+  refreshWallet();
+  addTx('Add', amount);
+}
+function spendBalance(amount=50){
+  if(wallet >= amount){
+    wallet -= amount;
+    localStorage.setItem('incoming_wallet', wallet);
+    refreshWallet();
+    addTx('Spend', amount);
+  } else alert('Not enough balance (demo).');
+}
+
+// wallet UI for inputs
+function walletAdd(){
+  const v = parseFloat(byId('walletAmount').value || 0);
+  if(v>0) { wallet += v; localStorage.setItem('incoming_wallet', wallet); refreshWallet(); addTx('Add', v); byId('walletAmount').value=''; }
+}
+function walletSpend(){
+  const v = parseFloat(byId('walletAmount').value || 0);
+  if(v>0){ if(wallet>=v){ wallet -= v; localStorage.setItem('incoming_wallet', wallet); refreshWallet(); addTx('Spend', v); byId('walletAmount').value=''; } else alert('Insufficient'); }
+}
+
+function addTx(type, amount){
+  const container = byId('txBox');
+  if(!container) return;
+  const d = document.createElement('div'); d.className='card small'; d.style.margin='8px 0';
+  d.innerText = `${type}: ৳ ${amount} — ${new Date().toLocaleString()}`;
+  container.prepend(d);
+  // wallet transactions history
+  const list = JSON.parse(localStorage.getItem('incoming_tx') || '[]');
+  list.unshift({type,amount,date:new Date().toISOString()});
+  localStorage.setItem('incoming_tx', JSON.stringify(list));
+  renderWalletTx();
+}
+function renderWalletTx(){
+  const box = byId('walletTx');
+  const list = JSON.parse(localStorage.getItem('incoming_tx') || '[]');
+  if(!box) return;
+  box.innerHTML = list.map(t=>`<div style="padding:6px;border-bottom:1px dashed rgba(255,255,255,0.03)">${t.type} ৳${t.amount} — ${new Date(t.date).toLocaleString()}</div>`).join('');
+}
+renderWalletTx();
+
+/* ====== Calculator ====== */
+function doCalc(op){
+  const a = parseFloat(byId('aVal').value || 0);
+  const b = parseFloat(byId('bVal').value || 0);
+  let r='-';
+  if(op==='+') r = a + b;
+  if(op==='-') r = a - b;
+  if(op==='*') r = a * b;
+  if(op==='/') r = (b===0)?'∞':(a/b);
+  byId('resultCalc').innerText = r;
+}
+
+/* ====== Converters ====== */
+function kmToMiles(){ const km = parseFloat(byId('kmVal').value||0); byId('milesOut').innerText = (km*0.621371).toFixed(3);}
+function bdtToUsd(){ const bdt = parseFloat(byId('bdtVal').value||0); const rate = parseFloat(localStorage.getItem('demo_bdt_usd')||110); byId('usdOut').innerText = (bdt/rate).toFixed(2);}
+byId('kmVal') && byId('kmVal').addEventListener('input', kmToMiles);
+byId('bdtVal') && byId('bdtVal').addEventListener('input', bdtToUsd);
+
+/* ====== Tasks ====== */
+function loadTasks(){ const arr = JSON.parse(localStorage.getItem('incoming_tasks')||'[]'); const ul = byId('taskList'); ul.innerHTML = ''; arr.forEach(t=>{ const li = document.createElement('li'); li.textContent = t; ul.appendChild(li);}); byId('taskCount') && (byId('taskCount').textContent = arr.length); }
+function addTask(){ const v = byId('taskIn').value.trim(); if(!v) return alert('Enter task'); const arr = JSON.parse(localStorage.getItem('incoming_tasks')||'[]'); arr.unshift(v); localStorage.setItem('incoming_tasks', JSON.stringify(arr)); byId('taskIn').value=''; loadTasks(); }
+loadTasks();
+
+/* ====== Notes ====== */
+function loadNotes(){ const arr = JSON.parse(localStorage.getItem('incoming_notes')||'[]'); const ul = byId('notesList'); ul.innerHTML=''; arr.forEach(n=>{ const li=document.createElement('li'); li.textContent = n; ul.appendChild(li); }); }
+function saveNote(){ const v = byId('noteIn').value.trim(); if(!v) return alert('Note empty'); const arr = JSON.parse(localStorage.getItem('incoming_notes')||'[]'); arr.unshift(v); localStorage.setItem('incoming_notes', JSON.stringify(arr)); byId('noteIn').value=''; loadNotes(); }
+function clearAllNotes(){ localStorage.removeItem('incoming_notes'); loadNotes(); }
+loadNotes();
+
+/* ====== Todo ====== */
+function loadTodo(){ const arr = JSON.parse(localStorage.getItem('incoming_todo')||'[]'); const ul = byId('todoList'); ul.innerHTML=''; arr.forEach(t=>{ const li=document.createElement('li'); li.textContent = t; ul.appendChild(li); }); }
+function addTodoItem(){ const v = byId('todoIn').value.trim(); if(!v) return; const arr = JSON.parse(localStorage.getItem('incoming_todo')||'[]'); arr.unshift(v); localStorage.setItem('incoming_todo', JSON.stringify(arr)); byId('todoIn').value=''; loadTodo(); }
+loadTodo();
+
+/* ====== Vault ====== */
+function tryUnlock(){
+  const pin = byId('vaultPin').value.trim();
+  if(pin === '0000'){ byId('vaultArea').classList.remove('hidden'); alert('Vault unlocked (demo).'); }
+  else alert('Wrong PIN (demo). Use 0000');
+}
+function showCalcVault(){ alert('Calculator disguise activated (demo)'); }
+
+/* ====== Tasks: UI already bindings done above ====== */
+
+/* ====== Referral copy ====== */
+byId('copyRefBtn').addEventListener('click', ()=>{
+  const ref = byId('referralLink').value; navigator.clipboard?.writeText(ref).then(()=>alert('Referral copied (demo)'));
+});
+
+/* ====== Market buy mock ====== */
+function mockBuy(item,price){
+  if(confirm('Buy '+item+' for ৳'+price+'? (demo)')){
+    if(wallet>=price){ wallet-=price; localStorage.setItem('incoming_wallet', wallet); refreshWallet(); addTx('Buy '+item, price); alert('Purchase success (demo)'); } else alert('Insufficient balance (demo).');
+  }
+}
+
+/* ====== Mock news load & weather (static) ====== */
+(function(){ const nl = byId('newsList'); if(nl){ const arr = JSON.parse(localStorage.getItem('incoming_news')||'[]'); if(arr.length===0) { arr.push('CompanyName launched Incoming App demo.'); arr.push('Wallet & Marketplace UI added.'); localStorage.setItem('incoming_news', JSON.stringify(arr)); } nl.innerHTML = JSON.parse(localStorage.getItem('incoming_news')).map(n=>'<li>'+n+'</li>').join(''); } })();
+
+/* ====== Leaderboard placeholder ====== */
+// (already static in markup) you may add dynamic later
+
+/* ====== Save company settings */
+function saveCompanySettings(){
+  const cname = byId('companyName').value.trim() || 'CompanyName';
+  localStorage.setItem('company_name', cname);
+  localStorage.setItem('app_theme', byId('themeSelect').value || 'dark');
+  applyCompanyName();
+  applyThemeFromStore();
+  alert('Settings saved (demo). Reload to see some changes.');
+}
+function resetCompanySettings(){ localStorage.removeItem('company_name'); localStorage.removeItem('app_theme'); applyCompanyName(); applyThemeFromStore(); alert('Settings reset'); }
+function applyThemeFromStore(){ const t = localStorage.getItem('app_theme') || 'dark'; if(t === 'light') document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode'); }
+applyThemeFromStore();
+
+/* ====== Notifications demo ====== */
+let notif = parseInt(localStorage.getItem('incoming_notif')||'0');
+function setNotif(n){ notif = n; localStorage.setItem('incoming_notif', notif); const el = byId('notifCount'); if(el){ el.textContent = notif; el.classList.toggle('hidden', notif===0);} }
+setNotif(notif);
+byId('notifBtn').addEventListener('click', ()=>{ alert('Notifications (demo): You have '+notif+' notifications.'); setNotif(0); });
+
+/* ====== copy company name to brand on top ====== */
+byId('companyName') && (byId('companyName').value = localStorage.getItem('company_name') || 'CompanyName');
+
+/* ====== On load: ensure panels default ====== */
+(function initPanels(){
+  // hide all except home by default unless logged in
+  document.querySelectorAll('.panel').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('home').classList.remove('hidden');
+})();
+
+/* ====== Quick open links on hero ====== */
+byId('goDashboard').addEventListener('click', ()=>{ document.querySelectorAll('.panel').forEach(p=>p.classList.add('hidden')); document.getElementById('dashboard').classList.remove('hidden'); document.querySelectorAll('.menu a').forEach(a=>a.classList.remove('active')); document.querySelector('.menu a[data-target="dashboard"]').classList.add('active'); });
+byId('goLogin').addEventListener('click', ()=>{ document.querySelectorAll('.panel').forEach(p=>p.classList.add('hidden')); document.getElementById('login').classList.remove('hidden'); document.querySelectorAll('.menu a').forEach(a=>a.classList.remove('active')); document.querySelector('.menu a[data-target="login"]').classList.add('active'); });
+
+/* ====== small helpers on initial render ====== */
+(function init(){
+  // show login if not logged
+  const user = JSON.parse(localStorage.getItem('incoming_user') || 'null');
+  if(user){ afterLogin(user); }
+  refreshWallet();
+  renderWalletTx();
+})();
+</script>
+</body>
+</html>
